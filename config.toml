@@ -1,7 +1,14 @@
+# .streamlit/config.toml
+
 [server]
-enableXsrfProtection = true
-maxUploadSize = 20
+enableXsrfProtection = true  # Protección contra ataques XSRF (Cross-Site Request Forgery)
+maxUploadSize = 20  # Tamaño máximo de archivos a subir (en MB)
+hideStreamlitBanner = true  # Oculta el banner de Streamlit (incluye el botón de "Fork")
+
+[theme]
+primaryColor = "#F63366"  # Color principal de la aplicación
+backgroundColor = "#FFFFFF"  # Color de fondo
 
 [client]
-hideMenuItems = true
+hideMenuItems = true  # Oculta elementos del menú
 
