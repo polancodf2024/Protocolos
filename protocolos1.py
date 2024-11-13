@@ -63,19 +63,18 @@ email_confirmacion = st.text_input("Confirma tu correo" if idioma == "Español" 
 # Selección de servicios
 servicios_solicitados = st.multiselect(
     "¿Qué servicios solicita?" if idioma == "Español" else "What services do you require?",
-    ["Evaluar calidad metodológica", "Revisión Ética y Bioética", "Asesoría estadística", "Revisión del consentimiento informado", "Revisión de cumplimiento legal y contractual", "Asesoría en cumplimiento de riesgos", "Soporte en gestión de datos", "Asistencia en procedimientos"] if idioma == "Español" else ["Methodological quality", "Ethical review", "Statistical advisory", "Informed consent review", "Legal compliance", "Risk advisory", "Data management support", "Approval procedures"]
+    ["Evaluar calidad metodológica", "Revisión Ética y Bioética", "Revisión del consentimiento informado", "Revisión de cumplimiento legal y contractual", "Asesoría en cumplimiento de riesgos", "Soporte en gestión de datos", "Asistencia en procedimientos"] if idioma == "Español" else ["Methodological quality", "Ethical review", "Informed consent review", "Legal compliance", "Risk advisory", "Data management support", "Approval procedures"]
 )
 
-# Opciones adicionales para "Asesoría estadística"
-if "Asesoría estadística" in servicios_solicitados or "Statistical advisory" in servicios_solicitados:
-    estadistica_opciones = st.multiselect(
-        "Selecciona servicios de asesoría estadística:" if idioma == "Español" else "Select statistical advisory services:",
-        ["Ninguno", "Normalidad de variables", "Asociación de variables", "Correlación", "Regresión logística", "Regresión lineal y Cox", "Ecuaciones estructurales"] if idioma == "Español" else ["None", "Normality", "Variable association", "Correlation", "Logistic regression", "Linear and Cox regression", "Structural equations"]
-    )
-    servicios_solicitados.extend(estadistica_opciones)
 
 # Subida de archivo
-uploaded_file = st.file_uploader("Sube tu archivo (.doc, .docx)" if idioma == "Español" else "Upload your file (.doc, .docx)", type=["doc", "docx"])
+st.error("Sube tu archivo (.doc, .docx). Nota: el tamaño máximo es 20 MB, no 200 MB" if idioma == "Español" else "Upload your file (.doc, .docx). Note: the maximum file size is 20 MB, not 200 MB")
+
+uploaded_file = st.file_uploader(
+    "Sube tu archivo (.doc, .docx)" if idioma == "Español" else "Upload your file (.doc, .docx)",
+    type=["doc", "docx"],
+    label_visibility="collapsed"
+)
 
 # Enviar archivo y registro
 if st.button("Enviar archivo" if idioma == "Español" else "Submit file"):
