@@ -40,11 +40,53 @@ def log_transaction(nombre, email, file_name, servicios):
         updated_df.to_excel(LOG_FILE, index=False)
 
 # Función para registrar transacciones en CSV
+
+# Función para registrar transacciones en CSV (modificada)
 def guardar_solicitud_csv(nombre, email, numero_economico, file_name, servicios):
     tz_mexico = pytz.timezone("America/Mexico_City")
     fecha_hora = datetime.now(tz_mexico).strftime("%Y-%m-%d %H:%M:%S")
     servicios_str = ", ".join(servicios)
+    estado = "Activo"  # Valor predeterminado para el nuevo campo Estado
+    fecha_terminacion = ""  # Campo vacío para la nueva columna Fecha terminación
 
+    encabezados = [
+        "Fecha y Hora",
+        "Nombre",
+        "Correo Electrónico",
+        "Número Económico",
+        "Nombre del Archivo",
+        "Servicios Solicitados",
+        "Estado",
+        "Fecha terminación",
+    ]  if idioma == "Español" else [
+        "Fecha y Hora",
+        "Nombre",
+        "Correo Electrónico",
+        "Número Económico",
+        "Nombre del Archivo",
+        "Servicios Solicitados",
+        "Estado",
+        "Fecha terminación",
+    ]
+    datos = [
+        fecha_hora,
+        nombre,
+        email,
+        numero_economico,
+        file_name,
+        servicios_str,
+        estado,
+        fecha_terminacion,
+    ]
+
+    try:
+        with open(CSV_FILE, mode='a', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            if file.tell() == 0:
+                writer.writerow(encabezados)
+            writer.writerow(datos)
+    except Exception as e:
+        st.error(f"Error al guardar la solicitud en CSV: {e}")
     encabezados = ["Fecha y Hora", "Nombre", "Correo Electrónico", "Número Económico", "Nombre del Archivo", "Servicios Solicitados"]
     datos = [fecha_hora, nombre, email, numero_economico, file_name, servicios_str]
 
@@ -122,25 +164,26 @@ def send_to_admin(file_data, file_name, nombre, email, numero_economico, servici
 
 # Interfaz de Streamlit
 st.image("escudo_COLOR.jpg", width=100)
-st.title("Revisión de Protocolos" if idioma == "Español" else "Protocol Review")
+st.title("Revisión de Protocolos" if idioma == "Español" else "Revisión de Protocolos")
 
 # Solicitar información del usuario
-nombre_completo = st.text_input("Nombre completo")
-email = st.text_input("Correo electrónico")
-email_confirmacion = st.text_input("Confirma tu correo")
-numero_economico = st.text_input("Número económico")
+nombre_completo = st.text_input("Nombre completo" if idioma == "Español" else "Full Name")
+email = st.text_input("Correo electrónico" if idioma == "Español" else "Email")
+email_confirmacion = st.text_input("Confirma tu correo" if idioma == "Español" else "Confirm Email")
+numero_economico = st.text_input("Número económico" if idioma == "Español" else "Id. Number")
 
 # Selección de servicios
 servicios_solicitados = st.multiselect(
-    "¿Qué servicios solicita?",
-    ["Revisión Ética y Bioética", "Evaluar calidad metodológica", "Asesoría en cumplimiento de riesgos", "Soporte en gestión de datos"]
+    "¿Qué servicios solicita?" if idioma == "Español" else "What services do you require?",
+    ["Requiero orientación técnica",  "Evaluar calidad metodológica", "Revisión Ética y Bioética", "Revisión del consentimiento informado", "Revisión de cumplimiento legal y contractual", "Asesoría en cumplimiento de riesgos", "Soporte en gestión de datos", "Asistencia en procedimientos"] if idioma == "Español" else ["I kindly request that you contact me at your earliest convenience.", "Methodological quality", "Ethical review", "Informed consent review", "Legal compliance", "Risk advisory", "Data management support", "Approval procedures"]
 )
+
 
 # Subida de archivo
 uploaded_file = st.file_uploader("Sube tu archivo (.doc, .docx)", type=["doc", "docx"])
 
 # Procesar envío
-if st.button("Enviar archivo"):
+if st.button("Enviar archivo" if idioma == "Español" else "Submit File"):
     if not nombre_completo or not email or not email_confirmacion or not numero_economico or uploaded_file is None or not servicios_solicitados:
         st.error("Por favor, completa todos los campos.")
     elif email != email_confirmacion:
@@ -155,5 +198,6 @@ if st.button("Enviar archivo"):
             send_confirmation(email, nombre_completo, servicios_solicitados, idioma)
             send_to_admin(file_data, file_name, nombre_completo, email, numero_economico, servicios_solicitados)
 
-            st.success("Envío exitoso. Puedes cerrar la aplicación.")
+            st.success("Envío exitoso. Puedes cerrar la aplicación." if idioma == "Español" else "Submission successful. You can close the application.")
+
 
