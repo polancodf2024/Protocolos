@@ -175,7 +175,7 @@ numero_economico = st.text_input("Número económico" if idioma == "Español" el
 # Selección de servicios
 servicios_solicitados = st.multiselect(
     "¿Qué servicios solicita?" if idioma == "Español" else "What services do you require?",
-    ["Requiero orientación técnica",  "Evaluar calidad metodológica", "Revisión Ética y Bioética", "Revisión del consentimiento informado", "Revisión de cumplimiento legal y contractual", "Asesoría en cumplimiento de riesgos", "Soporte en gestión de datos", "Asistencia en procedimientos"] if idioma == "Español" else ["I kindly request that you contact me at your earliest convenience.", "Methodological quality", "Ethical review", "Informed consent review", "Legal compliance", "Risk advisory", "Data management support", "Approval procedures"]
+    ["Requiero orientación técnica",  "Desarrollo metodológico", "Creación de bases de datos", "Sometimiento/enmiendas para aprobación en COFEPRIS", "Trámites para implementación en industria farmaceutica", "Diseño de instrumentación en REDcap", "Monitoreo clínico  para aprobación COFEPRIS"] if idioma == "Español" else ["Technical guidance required", "Methodological development", "Database creation", "Submission/amendments for COFEPRIS approval", "Procedures for implementation in the pharmaceutical industry", "Instrumentation design in REDcap", "Clinical monitoring for COFEPRIS approval"] 
 )
 
 
