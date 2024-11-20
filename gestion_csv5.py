@@ -2,10 +2,14 @@ import streamlit as st
 import os
 from pathlib import Path
 import pandas as pd
-import subprocess
+import base64
+import requests
 
-# Configuración del archivo CSV
+# Configuración del archivo CSV y GitHub
 CSV_FILE = "registro_protocolos.csv"
+GITHUB_REPO = "polancodf2024/protocolos"
+GITHUB_TOKEN = "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"
+GITHUB_FILE_PATH = "registro_protocolos.csv"  # Ruta en el repositorio GitHub
 
 # Solicitar contraseña al inicio
 PASSWORD = "Tt5plco5"
@@ -22,44 +26,40 @@ st.image("escudo_COLOR.jpg", width=150)
 # Título de la aplicación
 st.title("Gestión de Archivo: registro_protocolos.csv")
 
-# Función para inicializar configuración de Git
-def inicializar_git():
+# Función para subir el archivo a GitHub
+def subir_a_github(file_path, file_content):
     try:
-        # Configurar nombre y correo si es necesario
-        subprocess.run(["git", "config", "--global", "user.name", "Streamlit User"], check=True)
-        subprocess.run(["git", "config", "--global", "user.email", "streamlit@example.com"], check=True)
-    except Exception as e:
-        st.error("Error al configurar Git. Verifica los permisos y el entorno.")
-        st.error(str(e))
+        # Verificar si el archivo ya existe en el repositorio
+        url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{file_path}"
+        headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+        response = requests.get(url, headers=headers)
 
-# Función para actualizar el archivo en GitHub
-def actualizar_en_github(archivo):
-    try:
-        # Inicializar Git si no está configurado
-        if not os.path.exists(".git"):
-            subprocess.run(["git", "init"], check=True)
-            subprocess.run(["git", "remote", "add", "origin", "https://github.com/polancodf2024/PROTOCOLOS.git"], check=True)
-        
-        # Agregar el archivo a Git
-        subprocess.run(["git", "add", archivo], check=True)
-        
-        # Realizar un commit
-        subprocess.run(["git", "commit", "-m", "Actualización del archivo registro_protocolos.csv"], check=True)
-        
-        # Hacer push al repositorio remoto
-        subprocess.run(["git", "push", "-u", "origin", "main"], check=True)
-        
-        st.success("Archivo actualizado en GitHub exitosamente.")
-    except subprocess.CalledProcessError as e:
-        st.error("Error al intentar actualizar el archivo en GitHub.")
-        st.error(f"Comando: {e.cmd}")
-        st.error(f"Salida: {e.output}")
-    except Exception as e:
-        st.error("Error inesperado.")
-        st.error(str(e))
+        if response.status_code == 200:
+            # El archivo ya existe, necesitamos su SHA para actualizarlo
+            sha = response.json()["sha"]
+            data = {
+                "message": "Actualización del archivo registro_protocolos.csv desde Streamlit",
+                "content": base64.b64encode(file_content.encode()).decode(),
+                "sha": sha
+            }
+        else:
+            # El archivo no existe, lo crearemos
+            data = {
+                "message": "Creación del archivo registro_protocolos.csv desde Streamlit",
+                "content": base64.b64encode(file_content.encode()).decode()
+            }
 
-# Llama a la inicialización antes de actualizar GitHub
-inicializar_git()
+        # Subir el archivo a GitHub
+        response = requests.put(url, headers=headers, json=data)
+        if response.status_code in [200, 201]:
+            st.success("Archivo actualizado en GitHub exitosamente.")
+        else:
+            st.error(f"Error al subir el archivo a GitHub: {response.status_code}")
+            st.error(response.json())
+
+    except Exception as e:
+        st.error("Error al conectar con GitHub.")
+        st.error(str(e))
 
 # Opción para subir el archivo registro_protocolos.csv
 st.header("Subir el archivo registro_protocolos.csv")
@@ -72,16 +72,20 @@ if uploaded_csv is not None:
         with open(temp_file, "wb") as f:
             f.write(uploaded_csv.getbuffer())
 
-        # Reemplazar el archivo existente
+        # Reemplazar el archivo existente localmente
         os.system(f"cp {temp_file} {CSV_FILE}")
         st.success("Archivo registro_protocolos.csv subido y reemplazado exitosamente.")
-
-        # Actualizar en GitHub
-        actualizar_en_github(CSV_FILE)
 
         # Mostrar una vista previa del archivo subido
         df = pd.read_csv(CSV_FILE)
         st.dataframe(df)
+
+        # Leer el contenido del archivo para GitHub
+        with open(CSV_FILE, "r") as file:
+            file_content = file.read()
+
+        # Subir el archivo a GitHub
+        subir_a_github(GITHUB_FILE_PATH, file_content)
 
         # Eliminar el archivo temporal
         os.remove(temp_file)
