@@ -1,42 +1,36 @@
 import streamlit as st
-import pandas as pd
 from pathlib import Path
 
-# Configuración: ruta al directorio hermano
-RUTA_ANALISIS = Path.cwd().parent / "analisisestadistico"
+# Obtener el directorio actual
+directorio_actual = Path.cwd()
+
+# Subir al nivel padre para explorar directorios hermanos
+nivel_superior = directorio_actual.parent
+
+# Mostrar directorios disponibles
+st.title("Depuración de Rutas y Búsqueda de Archivo")
+st.header("Exploración de Directorios")
+
+st.write("Directorio actual:", directorio_actual)
+st.write("Nivel superior (padre):", nivel_superior)
+
+# Listar subdirectorios en el nivel superior
+st.header("Directorios en el nivel superior")
+for carpeta in nivel_superior.iterdir():
+    if carpeta.is_dir():
+        st.write(f"Directorio encontrado: {carpeta}")
+
+# Intentar buscar el archivo en el directorio 'analisisestadistico'
+RUTA_ANALISIS = nivel_superior / "analisisestadistico"
 ARCHIVO_OBJETIVO = "registro_analisis.csv"
 
-# Verificar si el archivo está en el directorio hermano
-st.title("Lectura de registro_analisis.csv")
-st.header("Búsqueda en el directorio hermano 'analisisestadistico'")
-
-archivo_encontrado = None
+st.header("Búsqueda en 'analisisestadistico'")
 if RUTA_ANALISIS.exists():
     archivo_path = RUTA_ANALISIS / ARCHIVO_OBJETIVO
     if archivo_path.exists():
-        archivo_encontrado = archivo_path
-        st.success(f"Archivo encontrado en: {archivo_encontrado}")
+        st.success(f"Archivo encontrado en: {archivo_path}")
     else:
-        st.error(f"No se encontró el archivo {ARCHIVO_OBJETIVO} en la ruta {RUTA_ANALISIS}")
+        st.error(f"No se encontró el archivo {ARCHIVO_OBJETIVO} en el directorio {RUTA_ANALISIS}")
 else:
-    st.error(f"La ruta {RUTA_ANALISIS} no existe.")
-
-# Mostrar contenido del archivo si se encontró
-if archivo_encontrado:
-    try:
-        st.header("Contenido del archivo")
-        df = pd.read_csv(archivo_encontrado)
-        st.dataframe(df)
-    except Exception as e:
-        st.error(f"No se pudo leer el archivo: {e}")
-    
-    # Descargar el archivo
-    st.header("Descargar archivo")
-    with open(archivo_encontrado, "rb") as file:
-        st.download_button(
-            label=f"Descargar {ARCHIVO_OBJETIVO}",
-            data=file,
-            file_name=ARCHIVO_OBJETIVO,
-            mime="text/csv"
-        )
+    st.error(f"El directorio 'analisisestadistico' no existe en {nivel_superior}")
 
