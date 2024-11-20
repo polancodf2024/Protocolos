@@ -22,9 +22,23 @@ st.image("escudo_COLOR.jpg", width=150)
 # Título de la aplicación
 st.title("Gestión de Archivo: registro_protocolos.csv")
 
-# Función para actualizar en GitHub
+# Función para inicializar configuración de Git
+def inicializar_git():
+    try:
+        # Configurar nombre y correo si es necesario
+        subprocess.run(["git", "config", "--global", "user.name", "Streamlit User"], check=True)
+        subprocess.run(["git", "config", "--global", "user.email", "streamlit@example.com"], check=True)
+    except Exception as e:
+        st.error("Error al configurar Git. Verifica los permisos y el entorno.")
+        st.error(str(e))
+
+# Función para actualizar el archivo en GitHub
 def actualizar_en_github(archivo):
     try:
+        # Inicializar Git si no está configurado
+        if not os.path.exists(".git"):
+            subprocess.run(["git", "init"], check=True)
+        
         # Agregar el archivo a Git
         subprocess.run(["git", "add", archivo], check=True)
         
@@ -35,9 +49,16 @@ def actualizar_en_github(archivo):
         subprocess.run(["git", "push"], check=True)
         
         st.success("Archivo actualizado en GitHub exitosamente.")
-    except Exception as e:
+    except subprocess.CalledProcessError as e:
         st.error("Error al intentar actualizar el archivo en GitHub.")
+        st.error(f"Comando: {e.cmd}")
+        st.error(f"Salida: {e.output}")
+    except Exception as e:
+        st.error("Error inesperado.")
         st.error(str(e))
+
+# Llama a la inicialización antes de actualizar GitHub
+inicializar_git()
 
 # Opción para subir el archivo registro_protocolos.csv
 st.header("Subir el archivo registro_protocolos.csv")
