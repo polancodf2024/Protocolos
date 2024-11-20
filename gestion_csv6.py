@@ -7,8 +7,8 @@ import requests
 
 # Configuración del archivo CSV y GitHub
 CSV_FILE = "registro_protocolos.csv"
-GITHUB_REPO = "polancodf2024/protocolos"
-GITHUB_TOKEN = "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"  # Reemplaza esto con tu token válido
+GITHUB_REPO = "polancodf2024/Protocolos"
+GITHUB_TOKEN = "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"
 GITHUB_FILE_PATH = "registro_protocolos.csv"  # Ruta en el repositorio GitHub
 
 # Solicitar contraseña al inicio
@@ -52,11 +52,12 @@ def subir_a_github(file_path, file_content):
         # Subir el archivo a GitHub
         response = requests.put(url, headers=headers, json=data)
 
+        # Depuración detallada
         st.write(f"URL: {url}")
         st.write(f"Headers: {headers}")
         st.write(f"Data: {data}")
         st.write(f"Response status: {response.status_code}")
-        st.write(f"Response content: {response.content}")
+        st.write(f"Response content: {response.content.decode()}")
 
         if response.status_code in [200, 201]:
             st.success("Archivo actualizado en GitHub exitosamente.")
