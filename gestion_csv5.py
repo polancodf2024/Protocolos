@@ -38,6 +38,7 @@ def actualizar_en_github(archivo):
         # Inicializar Git si no está configurado
         if not os.path.exists(".git"):
             subprocess.run(["git", "init"], check=True)
+            subprocess.run(["git", "remote", "add", "origin", "https://github.com/polancodf2024/PROTOCOLOS.git"], check=True)
         
         # Agregar el archivo a Git
         subprocess.run(["git", "add", archivo], check=True)
@@ -46,7 +47,7 @@ def actualizar_en_github(archivo):
         subprocess.run(["git", "commit", "-m", "Actualización del archivo registro_protocolos.csv"], check=True)
         
         # Hacer push al repositorio remoto
-        subprocess.run(["git", "push"], check=True)
+        subprocess.run(["git", "push", "-u", "origin", "main"], check=True)
         
         st.success("Archivo actualizado en GitHub exitosamente.")
     except subprocess.CalledProcessError as e:
