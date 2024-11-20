@@ -8,7 +8,7 @@ import requests
 # Configuración del archivo CSV y GitHub
 CSV_FILE = "registro_protocolos.csv"
 GITHUB_REPO = "polancodf2024/protocolos"
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = "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"
 GITHUB_FILE_PATH = "registro_protocolos.csv"  # Ruta en el repositorio GitHub
 
 # Solicitar contraseña al inicio
