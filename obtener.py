@@ -1,31 +1,28 @@
 import streamlit as st
-import os
-from pathlib import Path
 import pandas as pd
+from pathlib import Path
 
 # Configuración
+RUTA_ESPECIFICA = Path("/mount/src/analisisestadistico/")
 ARCHIVO_OBJETIVO = "registro_analisis.csv"
-DIRECTORIO_RAIZ = Path("/")  # Define la raíz para iniciar la búsqueda
 
-# Función para buscar el archivo recursivamente
-def buscar_archivo_recursivamente(directorio_raiz, archivo_objetivo):
-    for root, dirs, files in os.walk(directorio_raiz):
-        if archivo_objetivo in files:
-            return Path(root) / archivo_objetivo
-    return None
-
-# Mostrar título
+# Verificar si el archivo está en la ruta específica
 st.title("Lectura de registro_analisis.csv")
-st.header("Búsqueda recursiva del archivo desde la raíz")
+st.header("Búsqueda en ruta específica")
 
-# Buscar el archivo
-archivo_encontrado = buscar_archivo_recursivamente(DIRECTORIO_RAIZ, ARCHIVO_OBJETIVO)
+archivo_encontrado = None
+if RUTA_ESPECIFICA.exists():
+    archivo_path = RUTA_ESPECIFICA / ARCHIVO_OBJETIVO
+    if archivo_path.exists():
+        archivo_encontrado = archivo_path
+        st.success(f"Archivo encontrado en: {archivo_encontrado}")
+    else:
+        st.error(f"No se encontró el archivo {ARCHIVO_OBJETIVO} en la ruta {RUTA_ESPECIFICA}")
+else:
+    st.error(f"La ruta {RUTA_ESPECIFICA} no existe.")
 
-# Mostrar resultados
+# Mostrar contenido del archivo si se encontró
 if archivo_encontrado:
-    st.success(f"Archivo encontrado en: {archivo_encontrado}")
-
-    # Mostrar contenido del archivo
     try:
         st.header("Contenido del archivo")
         df = pd.read_csv(archivo_encontrado)
@@ -42,6 +39,4 @@ if archivo_encontrado:
             file_name=ARCHIVO_OBJETIVO,
             mime="text/csv"
         )
-else:
-    st.error(f"No se encontró el archivo {ARCHIVO_OBJETIVO} en la ruta {DIRECTORIO_RAIZ}.")
 
